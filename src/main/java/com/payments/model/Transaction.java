@@ -2,6 +2,9 @@ package com.payments.model;
 
 import com.payments.exception.InvalidTransactionException;
 
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * A single payment transaction.
  *
@@ -13,65 +16,62 @@ import com.payments.exception.InvalidTransactionException;
  */
 public final class Transaction {
 
-    // TODO 1: Declare a static counter (shared across all transactions),
-    //         starting at 0. It will be used to generate unique IDs.
+    private static final AtomicInteger counter = new AtomicInteger(0);
 
-    // TODO 2: Declare the fields, all final:
-    //         - transactionId : String
-    //         - amount        : double
-    //         - status        : TransactionStatus
+    private final String transactionId;
+    private final double amount;
+    private final TransactionStatus status;
 
     public Transaction(double amount) {
-        // TODO 3: PUBLIC constructor(amount)
-        //         - If amount is negative -> throw InvalidTransactionException.
-        //         - Increment the static counter and build the transactionId
-        //           in the format "T-1", "T-2", ...
-        //         - Set amount, and set status to PENDING.
+        if (amount < 0) {
+            throw new InvalidTransactionException("Amount cannot be negative");
+        }
+        this.transactionId = "T-" + counter.incrementAndGet();
+        this.amount = amount;
+        this.status = TransactionStatus.PENDING;
     }
 
     private Transaction(String transactionId, double amount, TransactionStatus status) {
-        // TODO 4: PRIVATE constructor(transactionId, amount, status)
-        //         - Used ONLY internally to build a settled copy.
-        //         - Simply assigns the given values to the final fields.
-        //         (This one does NOT touch the counter and does NOT validate again.)
+        this.transactionId = transactionId;
+        this.amount = amount;
+        this.status = status;
     }
 
     public Transaction settled() {
-        // TODO 5: public Transaction settled()
-        //         - Return a NEW Transaction that has:
-        //             the SAME transactionId,
-        //             the SAME amount,
-        //             but status = SETTLED.
-        //         - IMPORTANT: do not modify "this" object in any way.
-        //         (Hint: use the private constructor from TODO 4.)
-        return null;
+        return new Transaction(this.transactionId, this.amount, TransactionStatus.SETTLED);
     }
 
     public String getTransactionId() {
-        // TODO 6: Getters for transactionId, amount, status.
-        return null;
+        return transactionId;
     }
 
     public double getAmount() {
-        // TODO 6: Getters for transactionId, amount, status.
-        return 0.0;
+        return amount;
     }
 
     public TransactionStatus getStatus() {
-        // TODO 6: Getters for transactionId, amount, status.
-        return null;
+        return status;
     }
 
     @Override
     public boolean equals(Object o) {
-        // TODO 7: Override equals() and hashCode()
-        //         - Two Transactions are equal ONLY if their transactionId matches.
-        return super.equals(o);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Transaction that = (Transaction) o;
+        return Objects.equals(transactionId, that.transactionId);
     }
 
     @Override
     public int hashCode() {
-        // TODO 7: Override equals() and hashCode()
-        return super.hashCode();
+        return Objects.hash(transactionId);
+    }
+
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "transactionId='" + transactionId + '\'' +
+                ", amount=" + amount +
+                ", status=" + status +
+                '}';
     }
 }

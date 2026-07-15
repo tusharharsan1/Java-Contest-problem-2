@@ -1,11 +1,15 @@
 package com.payments.service;
 
 import com.payments.dto.SettlementReport;
+import com.payments.exception.GatewayException;
 import com.payments.model.Batch;
 import com.payments.model.Transaction;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.*;
 
 /**
  * The heart of the system.
@@ -13,65 +17,65 @@ import java.util.List;
  * parallel through the BankGateway, safely accumulates the results, and
  * returns a SettlementReport.
  */
-// NOTE: We have annotated this class for you as a service component.
 @Service
 public class PaymentBatchProcessor {
 
-    // TODO 1: Declare two final fields (composition — this class HAS-A each):
-    //         - BankGateway gateway
-    //         - SettlementAccumulator accumulator
+    private final BankGateway gateway;
+    private final SettlementAccumulator accumulator;
 
     public PaymentBatchProcessor(BankGateway gateway, SettlementAccumulator accumulator) {
-        // TODO 2: Constructor(BankGateway gateway, SettlementAccumulator accumulator)
-        //         - Assign both fields.
+        this.gateway = gateway;
+        this.accumulator = accumulator;
     }
 
     public SettlementReport processBatch(Batch<Transaction> batch) {
-        // TODO 3: public SettlementReport processBatch(Batch<Transaction> batch)
-        //         Follow these steps:
-        //
-        //         1. Find the number of CPU cores:
-        //               int cores = Runtime.getRuntime().availableProcessors();
-        //
-        //         2. Create a FIXED thread pool of size "cores":
-        //               ExecutorService pool = Executors.newFixedThreadPool(cores);
-        //
-        //         3. Split the batch into chunks:
-        //               List<List<Transaction>> chunks = batch.getChunks(cores);
-        //
-        //         4. For EACH chunk, build a Callable<Double> task (a lambda) that:
-        //               - loops over the transactions in that chunk
-        //               - calls gateway.settle(txn) for each   (handle GatewayException)
-        //               - calls accumulator.addSettledAmount(settledTxn.getAmount())
-        //               - keeps a running subtotal for the chunk
-        //               - returns that subtotal
-        //
-        //         5. SUBMIT ALL tasks FIRST (collect the Future<Double> objects in a list).
-        //            Do NOT call get() inside this loop — submit everything before
-        //            you start collecting, so the work runs in parallel.
-        //
-        //         6. Then COLLECT the results:
-        //               - in a try block, loop over the futures and call future.get()
-        //               - catch InterruptedException / ExecutionException and handle it
-        //               - in a FINALLY block, ALWAYS call pool.shutdown()
-        //
-        //         7. Find the highest-value SETTLED transaction using Streams,
-        //            returning it as an Optional<Transaction>.
-        //            (Empty batch -> Optional.empty())
-        //
-        //         8. Build and return a SettlementReport containing:
-        //               accumulator.getTotalSettled(),
-        //               accumulator.getSettledCount(),
-        //               the Optional<Transaction> from step 7.
-        return null;
+        int cores = Runtime.getRuntime().availableProcessors();
+        ExecutorService pool = Executors.newFixedThreadPool(cores);
+
+        List<List<Transaction>> chunks = batch.getChunks(cores);
+        List<Future<Double>> futures = new ArrayList<>();
+
+        for (List<Transaction> chunk : chunks) {
+            Callable<Double> task = () -> {
+                double subtotal = 0.0;
+                for (Transaction txn : chunk) {
+                    try {
+                        Transaction settledTxn = gateway.settle(txn);
+                        accumulator.addSettledAmount(settledTxn.getAmount());
+                        subtotal += settledTxn.getAmount();
+                    } catch (GatewayException e) {
+                        // ignore and continue for other transactions
+                    }
+                }
+                return subtotal;
+            };
+            futures.add(pool.submit(task));
+        }
+
+        try {
+            for (Future<Double> future : futures) {
+                future.get();
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            Thread.currentThread().interrupt();
+        } finally {
+            pool.shutdown();
+        }
+
+        Optional<Transaction> highestValueSettled = batch.getItems().stream()
+                .max((t1, t2) -> Double.compare(t1.getAmount(), t2.getAmount()))
+                .map(Transaction::settled);
+
+        return new SettlementReport(
+                accumulator.getTotalSettled(),
+                accumulator.getSettledCount(),
+                highestValueSettled
+        );
     }
 
     public double aggregateSubtotals(List<? extends Number> subtotals) {
-        // TODO 4: public double aggregateSubtotals(List<? extends Number> subtotals)
-        //         - Sum all the numbers in the list using Streams.
-        //         - The wildcard "? extends Number" lets this accept a List<Integer>,
-        //           a List<Double>, etc.
-        //         (Hint: map each element with Number::doubleValue, then sum.)
-        return 0.0;
+        return subtotals.stream()
+                .mapToDouble(Number::doubleValue)
+                .sum();
     }
 }

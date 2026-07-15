@@ -1,5 +1,6 @@
 package com.payments.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -8,32 +9,38 @@ import java.util.List;
  */
 public class Batch<T> {
 
-    // TODO 1: Declare a final field:  List<T> items
+    private final List<T> items;
 
     public Batch(List<T> items) {
-        // TODO 2: Constructor(List<T> items) -> store the list.
+        this.items = items;
     }
 
     public int size() {
-        // TODO 3: public int size()
-        //         - Return the number of items in the batch.
-        return 0;
+        return items.size();
     }
 
     public List<T> getItems() {
-        // TODO 4: public List<T> getItems()
-        //         - Return the items list.
-        return null;
+        return items;
     }
 
     public List<List<T>> getChunks(int chunkCount) {
-        // TODO 5: public List<List<T>> getChunks(int chunkCount)
-        //         - Split "items" into chunkCount roughly-equal sub-lists.
-        //         - Example: 10 items, chunkCount = 3  ->  [4 items], [3 items], [3 items]
-        //           (exact split can vary, just make sure NO item is lost
-        //            and the combined size of all chunks equals size()).
-        //         - Each returned sub-list will later be handed to one worker thread.
-        //         (Hint: List.subList(from, to) is useful here.)
-        return null;
+        List<List<T>> chunks = new ArrayList<>();
+        if (chunkCount <= 0 || items.isEmpty()) {
+            return chunks;
+        }
+
+        int totalItems = items.size();
+        int baseSize = totalItems / chunkCount;
+        int remainder = totalItems % chunkCount;
+
+        int start = 0;
+        for (int i = 0; i < chunkCount; i++) {
+            if (start >= totalItems) break;
+
+            int end = start + baseSize + (i < remainder ? 1 : 0);
+            chunks.add(items.subList(start, end));
+            start = end;
+        }
+        return chunks;
     }
 }
