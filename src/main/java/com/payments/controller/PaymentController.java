@@ -4,6 +4,8 @@ import com.payments.dto.SettlementReport;
 import com.payments.model.Batch;
 import com.payments.model.Transaction;
 import com.payments.service.PaymentBatchProcessor;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -21,7 +23,9 @@ public class PaymentController {
         this.processor = processor;
     }
 
-    public SettlementReport processBatch(Batch<Transaction> batch) {
+    // NOTE: We have added the necessary Spring web annotations for you.
+    @PostMapping("/process")
+    public SettlementReport processBatch(@RequestBody Batch<Transaction> batch) {
         // TODO 1: processBatch(Batch<Transaction> batch) -> delegate to the processor.
 
         // NOTE: This method should be ONE line that calls the matching method
