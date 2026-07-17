@@ -38,7 +38,7 @@ Complete `BankGateway`. It must:
 
 ### Task 4 — Parallel Batch Processing Engine (Executors + Callable + Future)
 
-Implement `PaymentBatchProcessor` and annotate it as a Spring `@Service`. It must:
+Implement `PaymentBatchProcessor`. It must:
 
 - Use composition: hold a `BankGateway` and a `SettlementAccumulator` as fields (constructor-injected).
 - Implement `SettlementReport processBatch(Batch<Transaction> batch)` which:
@@ -50,9 +50,8 @@ Implement `PaymentBatchProcessor` and annotate it as a Spring `@Service`. It mus
   - Returns a `SettlementReport` (total settled, settled count, and the `Optional<Transaction>` of the highest-value settled transaction, found via Streams).
 - Implement `aggregateSubtotals(List<? extends Number> subtotals)` — a method using a wildcard (`? extends Number`) that sums a list of chunk subtotals using Streams.
 
-### Task 5 — Controller Delegation
+*(Note: Spring annotations like `@Service` are already provided for you in the starter code).*
 
-Complete `PaymentController`. Ensure it is recognized as a Spring REST Controller. It must:
+### Task 5 — Controller Delegation (Provided)
 
-- Accept `PaymentBatchProcessor` via Constructor Injection so Spring auto-wires the dependency.
-- Delegate all public methods directly to the service layer without containing any business logic.
+The `PaymentController` has already been implemented and annotated for you. It serves as a thin REST layer delegating directly to the `PaymentBatchProcessor` without holding any business logic. You do not need to modify this file, but you can review it to understand the entry point of the API.
