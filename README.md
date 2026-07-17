@@ -30,17 +30,15 @@ Implement `SettlementAccumulator`. It must:
 
 ### Task 3 — Gateway Permit Control (Semaphore)
 
-Complete `BankGateway`. It must:
+Complete `BankGateway`. The basic initialization has been provided for you. You must:
 
-- Accept a maximum number of concurrent connections in its constructor and enforce it using a counting `Semaphore`.
+- Use the provided `Semaphore` to enforce a maximum number of concurrent connections.
 - Implement `settle(Transaction txn)` which: acquires a permit (blocking if the limit is reached), simulates contacting the bank (a short `Thread.sleep`), returns a settled copy of the transaction, and always releases the permit in a `finally` block — even if an exception is thrown mid-settlement.
 - Throw a checked `GatewayException` if settlement is interrupted, and ensure the permit is still released.
 
 ### Task 4 — Parallel Batch Processing Engine (Executors + Callable + Future)
 
-Implement `PaymentBatchProcessor`. It must:
-
-- Use composition: hold a `BankGateway` and a `SettlementAccumulator` as fields (constructor-injected).
+Implement `PaymentBatchProcessor`. The dependencies (`BankGateway` and `SettlementAccumulator`) have been declared and injected via the constructor for you. You must:
 - Implement `SettlementReport processBatch(Batch<Transaction> batch)` which:
   - Creates a fixed thread pool sized to `Runtime.getRuntime().availableProcessors()`.
   - Splits the batch into chunks (one per worker).

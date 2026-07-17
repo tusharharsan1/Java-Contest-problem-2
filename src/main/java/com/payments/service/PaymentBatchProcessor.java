@@ -17,13 +17,14 @@ import java.util.List;
 @Service
 public class PaymentBatchProcessor {
 
-    // TODO 1: Declare two final fields (composition — this class HAS-A each):
-    //         - BankGateway gateway
-    //         - SettlementAccumulator accumulator
+    // Declare two final fields (composition — this class HAS-A each):
+    private final BankGateway gateway;
+    private final SettlementAccumulator accumulator;
 
     public PaymentBatchProcessor(BankGateway gateway, SettlementAccumulator accumulator) {
-        // TODO 2: Constructor(BankGateway gateway, SettlementAccumulator accumulator)
-        //         - Assign both fields.
+        // Assign both fields.
+        this.gateway = gateway;
+        this.accumulator = accumulator;
     }
 
     public SettlementReport processBatch(Batch<Transaction> batch) {

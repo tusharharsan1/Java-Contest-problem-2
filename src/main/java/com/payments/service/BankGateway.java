@@ -4,6 +4,8 @@ import com.payments.exception.GatewayException;
 import com.payments.model.Transaction;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.Semaphore;
+
 /**
  * Simulates the downstream bank connection.
  * The bank allows only a LIMITED number of connections at the same time,
@@ -12,11 +14,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class BankGateway {
 
-    // TODO 1: Declare a Semaphore field (final).
+    // Declare a Semaphore field (final).
+    private final Semaphore semaphore;
 
     public BankGateway() {
-        // TODO 2: Constructor
-        //         - Initialise the Semaphore with 5 permits.
+        // Constructor
+        // - Initialise the Semaphore with 5 permits.
+        this.semaphore = new Semaphore(5);
     }
 
     public Transaction settle(Transaction txn) throws GatewayException {
