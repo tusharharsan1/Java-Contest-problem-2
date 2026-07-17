@@ -50,7 +50,6 @@ Implement `PaymentBatchProcessor`. It must:
   - Returns a `SettlementReport` (total settled, settled count, and the `Optional<Transaction>` of the highest-value settled transaction, found via Streams).
 - Implement `aggregateSubtotals(List<? extends Number> subtotals)` — a method using a wildcard (`? extends Number`) that sums a list of chunk subtotals using Streams.
 
-*(Note: Spring annotations like `@Service` are already provided for you in the starter code).*
 
 ### Task 5 — Controller Delegation (Provided)
 
