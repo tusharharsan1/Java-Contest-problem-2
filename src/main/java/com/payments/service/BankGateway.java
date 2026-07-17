@@ -14,12 +14,10 @@ import java.util.concurrent.Semaphore;
 @Component
 public class BankGateway {
 
-    // Declare a Semaphore field (final).
+   
     private final Semaphore semaphore;
 
     public BankGateway() {
-        // Constructor
-        // - Initialise the Semaphore with 5 permits.
         this.semaphore = new Semaphore(5);
     }
 
