@@ -3,6 +3,7 @@ package com.payments.service;
 import com.payments.dto.SettlementReport;
 import com.payments.model.Batch;
 import com.payments.model.Transaction;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -12,20 +13,21 @@ import java.util.List;
  * parallel through the BankGateway, safely accumulates the results, and
  * returns a SettlementReport.
  */
-// TODO 1: Annotate this class so Spring treats it as a service component.
+// NOTE: We have annotated this class for you as a service component.
+@Service
 public class PaymentBatchProcessor {
 
-    // TODO 2: Declare two final fields (composition — this class HAS-A each):
+    // TODO 1: Declare two final fields (composition — this class HAS-A each):
     //         - BankGateway gateway
     //         - SettlementAccumulator accumulator
 
     public PaymentBatchProcessor(BankGateway gateway, SettlementAccumulator accumulator) {
-        // TODO 3: Constructor(BankGateway gateway, SettlementAccumulator accumulator)
-        //         - Assign both fields (constructor injection).
+        // TODO 2: Constructor(BankGateway gateway, SettlementAccumulator accumulator)
+        //         - Assign both fields.
     }
 
     public SettlementReport processBatch(Batch<Transaction> batch) {
-        // TODO 4: public SettlementReport processBatch(Batch<Transaction> batch)
+        // TODO 3: public SettlementReport processBatch(Batch<Transaction> batch)
         //         Follow these steps:
         //
         //         1. Find the number of CPU cores:
@@ -65,7 +67,7 @@ public class PaymentBatchProcessor {
     }
 
     public double aggregateSubtotals(List<? extends Number> subtotals) {
-        // TODO 5: public double aggregateSubtotals(List<? extends Number> subtotals)
+        // TODO 4: public double aggregateSubtotals(List<? extends Number> subtotals)
         //         - Sum all the numbers in the list using Streams.
         //         - The wildcard "? extends Number" lets this accept a List<Integer>,
         //           a List<Double>, etc.

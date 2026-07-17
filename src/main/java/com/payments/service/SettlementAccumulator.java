@@ -1,10 +1,13 @@
 package com.payments.service;
 
+import org.springframework.stereotype.Component;
+
 /**
  * Shared across ALL worker threads during a batch run.
  * Multiple threads will call addSettledAmount(...) at the SAME time,
  * so the updates below MUST be made thread-safe.
  */
+@Component
 public class SettlementAccumulator {
 
     // Shared mutable state — accessed by many threads concurrently.

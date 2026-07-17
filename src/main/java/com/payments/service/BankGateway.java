@@ -2,20 +2,21 @@ package com.payments.service;
 
 import com.payments.exception.GatewayException;
 import com.payments.model.Transaction;
+import org.springframework.stereotype.Component;
 
 /**
  * Simulates the downstream bank connection.
  * The bank allows only a LIMITED number of connections at the same time,
- * so we must not let more than "maxConcurrentConnections" threads inside
- * settle(...) simultaneously.
+ * so we must not let more than 5 threads inside settle(...) simultaneously.
  */
+@Component
 public class BankGateway {
 
     // TODO 1: Declare a Semaphore field (final).
 
-    public BankGateway(int maxConcurrentConnections) {
-        // TODO 2: Constructor(int maxConcurrentConnections)
-        //         - Initialise the Semaphore with that many permits.
+    public BankGateway() {
+        // TODO 2: Constructor
+        //         - Initialise the Semaphore with 5 permits.
     }
 
     public Transaction settle(Transaction txn) throws GatewayException {
